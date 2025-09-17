@@ -1,0 +1,245 @@
+package PotholeDriving;
+//Ashmeet Singh
+
+import java.util.Scanner;
+import java.util.Random;
+
+public class PotholeDriving {
+	
+	//size of array
+	static final int SIZE = 10;
+	
+	//the car
+	static final char CAR = 'X';
+	
+	//home
+	static final char HOME = '^';
+	
+	//pot hole
+	static final char POTHOLE = 'O';
+	
+	//road
+	static final char ROAD = '_';
+	
+	//number of pot holes
+	static final int NUM_POTHOLES = 6;
+	
+	//make the 2D array
+	static char[][] matrix = new char[SIZE][SIZE];
+	
+	//pot holes, carX, carY, homeX, homeY, game over, win
+	static boolean[][] potholes = new boolean[SIZE][SIZE];
+	static  int carX, carY;
+	static int homeX, homeY;
+	static boolean gameOver;
+	static boolean win;
+	
+	//create scanner to read input
+	static Scanner input = new Scanner(System.in);
+	
+	//random generator
+	static Random random = new Random();
+	
+	//declares playermove variable
+	static String playermove;
+
+	public static void main(String[] args) {
+		
+		do
+		{
+			System.out.println("Welcome to Pothole Driving! Get home while avoiding potholes!");
+		
+			initializeGame();
+		
+			while(!gameOver)
+			{
+				displayRoad();
+				moveCar();
+				checkGameState();
+			}
+			
+			if(win)
+			{
+				System.out.println("You made it home safely");
+			}
+			else
+			{
+				System.out.println("You hit a pothole! Game over.");
+			}
+			System.out.println("Would you like to play again? (Yes/No): ");
+			playermove = input.next();
+		}
+		while(playermove.equalsIgnoreCase("Yes"));
+	
+		System.out.println("Goodbye!");
+		input.close();
+	}
+	static void initializeGame()
+	{
+		gameOver = false;
+		win = false;
+	
+		
+		//fill road
+		for(int i = 0; i < SIZE; i++)
+		{
+			for(int j = 0; j < SIZE; j++)
+			{
+				matrix[i][j] = ROAD;
+				potholes[i][j] = false;
+			}
+		}
+		
+		//place car
+		carX = 0;
+		carY = 0;
+		matrix[carX][carY] = CAR;
+		
+		//place home
+		homeX = SIZE - 1;
+		homeY = SIZE - 1;
+		
+		//place random pot holes
+		int potholesPlaced = 0;
+		while(potholesPlaced < NUM_POTHOLES)
+		{
+			int x = random.nextInt(SIZE);
+			int y = random.nextInt(SIZE);
+			
+			//ensure random pot holes isn't on car or home
+			if((x == carX && y == carY) || (x == homeX && y == homeY))
+			{
+				continue;
+			}
+			
+			//places pot hole is road is empty
+			if(!potholes[x][y])
+			{
+				potholes[x][y] = true;
+				potholesPlaced++;
+			}
+		}	
+	}
+	
+	
+	//displays the road
+	static void displayRoad()
+	{
+		System.out.println();
+		for(int i = 0; i < SIZE; i++)
+		{
+			for(int j = 0; j < SIZE; j++)
+			{
+				if(i == carX && j == carY)
+				{
+					System.out.print(CAR);
+				}
+				else if(i == homeX && j == homeY)
+				{
+					System.out.print(HOME);
+				}
+				else
+				{
+					System.out.print(ROAD);
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+			
+			//moves car by input
+			static void moveCar()
+			{
+				int dx = 0, dy = 0;
+				boolean validInput = false;
+				
+				//Get X direction input
+				while(!validInput)
+				{
+					System.out.println("Enter either -1, 0, or 1 for X direction (or 9 to quit)");
+					if(input.hasNextInt())
+					{
+						int xInput = input.nextInt();
+						if(xInput == 9)
+						{
+							System.exit(0);
+						}
+						else if(xInput >= -1 && xInput <= 1)
+						{
+							dx = xInput;
+							validInput = true;
+						}
+						else
+						{
+							System.out.println("Enter either -1, 0, or 1.");
+						}
+					}
+					else
+					{
+						System.out.println("Invalid input! Please enter a number.");
+						input.next();
+					}
+				}
+				
+				validInput = false;
+				//Get Y direction input
+				while(!validInput)
+				{
+					System.out.println("Enter either -1, 0, or 1 for Y direction (or 9 to quit)");
+					if(input.hasNextInt())
+					{
+						int yInput = input.nextInt();
+						if(yInput == 9)
+						{
+							System.exit(0);
+						}
+						else if(yInput >= -1 && yInput <= 1)
+						{
+							dy = yInput;
+							validInput = true;
+						}
+						else
+						{
+							System.out.println("Enter either -1, 0, or 1.");
+						}
+					}
+					else
+					{
+						System.out.println("Invalid input! Please enter a number.");
+						input.next();
+					}
+				}
+				
+				int newX = carX + dx;
+				int newY = carY + dy;
+				
+				if(newX >= 0 && newX < SIZE && newY >= 0 && newY < SIZE)
+				{
+					matrix[carX][carY] = ROAD;
+					
+					carX = newX;
+					carY = newY;
+					matrix[carX][carY] = CAR;
+				}
+				else
+				{
+					System.out.println("Invalid move! You cannot move outside the matrix");
+				}
+			}
+				static void checkGameState()
+				{
+				if(potholes[carX][carY])
+				{
+					gameOver = true;
+					win = false;
+				}
+				else if(carX == homeX && carY == homeY)
+				{
+					gameOver = true;
+					win = true;
+				}
+						
+			}
+	}
+
